@@ -1,0 +1,9 @@
+Resources/Models/*.gguf
+Generated/
+*.xcodeproj/
+build/
+ipa_root/
+*.ipa
+.DS_Store
+.swiftpm/
+.build/

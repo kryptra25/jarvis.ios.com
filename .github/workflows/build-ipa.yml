@@ -1,0 +1,67 @@
+name: Build unsigned IPA
+
+# Run manually from the Actions tab ("Run workflow"), or automatically on
+# every push to main. The output is an UNSIGNED .ipa — that's intentional.
+# Sideloadly does the actual code-signing on your computer using your own
+# free Apple ID when it installs the app to your iPhone, so no certificates,
+# secrets, or paid Apple Developer account are needed in this workflow at all.
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Download on-device model
+        run: bash scripts/download_model.sh
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build unsigned app
+        run: |
+          xcodebuild \
+            -project Jarvis.xcodeproj \
+            -scheme Jarvis \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Package IPA
+        run: |
+          set -euo pipefail
+          PRODUCTS_DIR="build/Build/Products/Release-iphoneos"
+          APP_PATH="$PRODUCTS_DIR/Jarvis.app"
+          if [ ! -d "$APP_PATH" ]; then
+            echo "Couldn't find built app at $APP_PATH"
+            ls -la "$PRODUCTS_DIR" || true
+            exit 1
+          fi
+          mkdir -p ipa_root/Payload
+          cp -r "$APP_PATH" ipa_root/Payload/
+          cd ipa_root
+          zip -r -y ../Jarvis-unsigned.ipa Payload
+          cd ..
+          echo "Built: Jarvis-unsigned.ipa ($(du -h Jarvis-unsigned.ipa | cut -f1))"
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Jarvis-unsigned-ipa
+          path: Jarvis-unsigned.ipa
+          retention-days: 14

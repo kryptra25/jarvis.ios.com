@@ -1,0 +1,62 @@
+name: Jarvis
+options:
+  bundleIdPrefix: com.kryptra
+  deploymentTarget:
+    iOS: "18.0"
+  createIntermediateGroups: true
+
+configs:
+  Debug: debug
+  Release: release
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    ENABLE_BITCODE: NO
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGNING_REQUIRED: NO
+    CODE_SIGNING_ALLOWED: NO
+    CODE_SIGN_IDENTITY: ""
+    DEVELOPMENT_TEAM: ""
+    IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+    TARGETED_DEVICE_FAMILY: "1"
+
+packages:
+  SwiftLlama:
+    url: https://github.com/ShenghaiWang/SwiftLlama.git
+    from: 0.4.0
+
+targets:
+  Jarvis:
+    type: application
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: Sources
+    resources:
+      - path: Resources/Assets.xcassets
+      - path: Resources/Models
+    dependencies:
+      - package: SwiftLlama
+        product: SwiftLlama
+    info:
+      path: Generated/Info.plist
+      properties:
+        CFBundleDisplayName: JARVIS
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UIRequiresFullScreen: true
+        ITSAppUsesNonExemptEncryption: false
+        NSMicrophoneUsageDescription: "JARVIS needs the microphone to hear what you say."
+        NSSpeechRecognitionUsageDescription: "JARVIS converts your speech to text entirely on this device so it can understand your commands."
+        NSFaceIDUsageDescription: "JARVIS uses Face ID to confirm it's you before unlocking the assistant."
+        LSApplicationCategoryType: public.app-category.productivity
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kryptra.jarvis
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        SWIFT_EMIT_LOC_STRINGS: NO

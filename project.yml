@@ -23,9 +23,9 @@ settings:
 
 packages:
   SwiftLlama:
-    url: https://github.com/ShenghaiWang/SwiftLlama.git
-    from: 0.4.0
-
+    url: https://github.com/pgorzelany/swift-llama-cpp.git
+    from: 1.0.0
+    
 targets:
   Jarvis:
     type: application

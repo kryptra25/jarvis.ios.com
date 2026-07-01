@@ -34,10 +34,28 @@ final class LocalLLMService: ObservableObject {
     func loadModelIfNeeded() {
         guard case .notLoaded = loadState else { return }
         loadState = .loading
-        guard let url = Bundle.main.url(forResource: Self.modelFileName, withExtension: Self.modelFileExtension) else {
+
+        // XcodeGen may copy Resources/Models/ as either:
+        //   (a) flat into the bundle root  → Bundle.main.url(forResource:withExtension:) finds it
+        //   (b) as a Models/ subfolder     → we need to look one level deeper
+        var modelURL = Bundle.main.url(
+            forResource: Self.modelFileName,
+            withExtension: Self.modelFileExtension
+        )
+        if modelURL == nil {
+            let candidate = Bundle.main.bundleURL
+                .appendingPathComponent("Models")
+                .appendingPathComponent("\(Self.modelFileName).\(Self.modelFileExtension)")
+            if FileManager.default.fileExists(atPath: candidate.path) {
+                modelURL = candidate
+            }
+        }
+
+        guard let url = modelURL else {
             loadState = .failed("Model file not found in app bundle. Make sure scripts/download_model.sh ran before building.")
             return
         }
+
         llamaService = LlamaService(
             modelUrl: url,
             config: .init(batchSize: 256, maxTokenCount: 2048, useGPU: true)

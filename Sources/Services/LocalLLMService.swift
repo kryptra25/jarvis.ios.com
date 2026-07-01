@@ -77,7 +77,7 @@ final class LocalLLMService: ObservableObject {
                 }
                 let prompt = Self.buildChatMLPrompt(system: system, history: history, userMessage: userMessage)
                 do {
-                    let stream = await llama.start(for: prompt)
+                    let stream = await llama.start(for: Prompt(prompt))
                     for try await token in stream {
                         continuation.yield(token)
                     }

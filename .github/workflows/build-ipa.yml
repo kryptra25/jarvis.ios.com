@@ -29,14 +29,6 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
 
-      - name: Inspect SwiftLlama Prompt API
-        run: |
-          xcodebuild -resolvePackageDependencies -project Jarvis.xcodeproj \
-            -derivedDataPath build 2>/dev/null || true
-          echo "=== Prompt.swift ===" && find build -name "Prompt.swift" -exec cat {} \; 2>/dev/null
-          echo "=== TypeAlias.swift ===" && find build -name "TypeAlias.swift" -exec cat {} \; 2>/dev/null
-          echo "=== Swiftllama.swift ===" && find build -name "Swiftllama.swift" -exec cat {} \; 2>/dev/null
-
       - name: Build unsigned app
         run: |
           xcodebuild \
